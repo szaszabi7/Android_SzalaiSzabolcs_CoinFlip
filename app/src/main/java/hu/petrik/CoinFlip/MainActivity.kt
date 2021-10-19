@@ -3,9 +3,11 @@ package hu.petrik.CoinFlip
 import android.content.DialogInterface
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Handler
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import java.util.*
 
@@ -25,44 +27,58 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         init()
+
         buttonFej.setOnClickListener() {
             var eredmeny = random.nextBoolean()
-            if (tries == 5 && win < lose) {
-                alertLose()
-            } else if (tries == 5 && win > lose) {
-                alertWin()
-            } else {
-                if (eredmeny) {
-                    coin.setImageResource(R.drawable.heads)
-                    win++
-                    textVievWin.setText("Győzelem: " + win)
-                } else {
-                    coin.setImageResource(R.drawable.tails)
-                    lose++
-                    textVievLose.setText("Vereség: " + lose)
+            coin.animate().apply {
+                duration = 300
+                rotationXBy(360F)
+            }.withEndAction {
+                if (win != 3 && lose != 3) {
+                    if (eredmeny) {
+                        coin.setImageResource(R.drawable.heads)
+                        win++
+                        textVievWin.setText("Győzelem: " + win)
+                    } else {
+                        coin.setImageResource(R.drawable.tails)
+                        lose++
+                        textVievLose.setText("Vereség: " + lose)
+                    }
+                    tries++
+                    textVievTries.setText("Dobások: " + tries)
                 }
-                tries++
-                textVievTries.setText("Dobások: " + tries)
+                else if (win == 3) {
+                    alertWin()
+                } else if (lose == 3) {
+                    alertLose()
+                }
             }
         }
+
         buttonIras.setOnClickListener() {
             var eredmeny = random.nextBoolean()
-            if (tries == 5 && win < lose) {
-                alertLose()
-            } else if (tries == 5 && win > lose) {
-                alertWin()
-            } else {
-                if (eredmeny) {
-                    coin.setImageResource(R.drawable.tails)
-                    win++
-                    textVievWin.setText("Győzelem: " + win)
-                } else {
-                    coin.setImageResource(R.drawable.heads)
-                    lose++
-                    textVievLose.setText("Vereség: " + lose)
+            coin.animate().apply {
+                duration = 300
+                rotationXBy(360F)
+            }.withEndAction {
+                if (win != 3 && lose != 3) {
+                    if (!eredmeny) {
+                        coin.setImageResource(R.drawable.tails)
+                        lose++
+                        textVievWin.setText("Győzelem: " + lose)
+                    } else {
+                        coin.setImageResource(R.drawable.heads)
+                        win++
+                        textVievLose.setText("Vereség: " + win)
+                    }
+                    tries++
+                    textVievTries.setText("Dobások: " + tries)
                 }
-                tries++
-                textVievTries.setText("Dobások: " + tries)
+                else if (win == 3) {
+                    alertLose()
+                } else if (lose == 3) {
+                    alertWin()
+                }
             }
         }
     }
@@ -81,10 +97,11 @@ class MainActivity : AppCompatActivity() {
         val builder = AlertDialog.Builder(this)
         builder.setTitle("Vereség")
         builder.setMessage("Szeretne új játékot játszani?")
-        builder.setPositiveButton("Yes") { _: DialogInterface, _: Int ->
+        builder.setCancelable(false)
+        builder.setPositiveButton("Yes") { dialog, id ->
             reset()
         }
-        builder.setNegativeButton("Nem") { _: DialogInterface, _: Int ->
+        builder.setNegativeButton("Nem") { dialog, id ->
             finish()
             reset()
         }
@@ -95,17 +112,18 @@ class MainActivity : AppCompatActivity() {
         val builder = AlertDialog.Builder(this)
         builder.setTitle("Győzelem")
         builder.setMessage("Szeretne új játékot játszani?")
-        builder.setPositiveButton("Yes") { _: DialogInterface, _: Int ->
+        builder.setCancelable(false)
+        builder.setPositiveButton("Yes") { dialog, id ->
             reset()
         }
-        builder.setNegativeButton("Nem") { _: DialogInterface, _: Int ->
+        builder.setNegativeButton("Nem") { dialog, id ->
             finish()
             reset()
         }
         builder.show()
     }
 
-    fun reset() {
+    private fun reset() {
         coin.setImageResource(R.drawable.heads)
         tries = 0
         win = 0
