@@ -29,13 +29,13 @@ class MainActivity : AppCompatActivity() {
         init()
 
         buttonFej.setOnClickListener() {
-            var eredmeny = random.nextBoolean()
+            var eredmeny = random.nextInt(2)
             coin.animate().apply {
                 duration = 300
                 rotationXBy(360F)
             }.withEndAction {
                 if (win != 3 && lose != 3) {
-                    if (eredmeny) {
+                    if (eredmeny == 1) {
                         coin.setImageResource(R.drawable.heads)
                         win++
                         textVievWin.setText("Győzelem: " + win)
@@ -47,38 +47,30 @@ class MainActivity : AppCompatActivity() {
                     tries++
                     textVievTries.setText("Dobások: " + tries)
                 }
-                else if (win == 3) {
-                    alertWin()
-                } else if (lose == 3) {
-                    alertLose()
-                }
+                gameEnd()
             }
         }
 
         buttonIras.setOnClickListener() {
-            var eredmeny = random.nextBoolean()
+            var eredmeny = random.nextInt(2)
             coin.animate().apply {
                 duration = 300
                 rotationXBy(360F)
             }.withEndAction {
                 if (win != 3 && lose != 3) {
-                    if (!eredmeny) {
+                    if (eredmeny == 1) {
                         coin.setImageResource(R.drawable.tails)
-                        lose++
-                        textVievWin.setText("Győzelem: " + lose)
+                        win++
+                        textVievWin.setText("Győzelem: " + win)
                     } else {
                         coin.setImageResource(R.drawable.heads)
-                        win++
-                        textVievLose.setText("Vereség: " + win)
+                        lose++
+                        textVievLose.setText("Vereség: " + lose)
                     }
                     tries++
                     textVievTries.setText("Dobások: " + tries)
                 }
-                else if (win == 3) {
-                    alertLose()
-                } else if (lose == 3) {
-                    alertWin()
-                }
+                gameEnd()
             }
         }
     }
@@ -93,34 +85,30 @@ class MainActivity : AppCompatActivity() {
         random = Random()
     }
 
-    private fun alertLose() {
-        val builder = AlertDialog.Builder(this)
-        builder.setTitle("Vereség")
-        builder.setMessage("Szeretne új játékot játszani?")
-        builder.setCancelable(false)
-        builder.setPositiveButton("Yes") { dialog, id ->
-            reset()
+    private fun gameEnd() {
+        if (win == 3) {
+            val builder = AlertDialog.Builder(this)
+                .setTitle("Győzelem")
+                .setMessage("Szeretne új játékot játszani?")
+                .setCancelable(false)
+                .setPositiveButton("Yes") { dialog, id ->
+                    reset()
+                }
+                .setNegativeButton("Nem") { dialog, id ->
+                    finishAffinity()
+                }.show()
+        } else if (lose == 3) {
+            val builder = AlertDialog.Builder(this)
+                .setTitle("Vereség")
+                .setMessage("Szeretne új játékot játszani?")
+                .setCancelable(false)
+                .setPositiveButton("Yes") { dialog, id ->
+                    reset()
+                }
+                .setNegativeButton("Nem") { dialog, id ->
+                    finishAffinity()
+                }.show()
         }
-        builder.setNegativeButton("Nem") { dialog, id ->
-            finish()
-            reset()
-        }
-        builder.show()
-    }
-
-    private fun alertWin() {
-        val builder = AlertDialog.Builder(this)
-        builder.setTitle("Győzelem")
-        builder.setMessage("Szeretne új játékot játszani?")
-        builder.setCancelable(false)
-        builder.setPositiveButton("Yes") { dialog, id ->
-            reset()
-        }
-        builder.setNegativeButton("Nem") { dialog, id ->
-            finish()
-            reset()
-        }
-        builder.show()
     }
 
     private fun reset() {
